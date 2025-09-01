@@ -26,16 +26,18 @@ export const signUp = async (email: string, password: string, userData: {
   
   if (data.user) {
     // Create user profile
-    const { error: profileError } = await supabase
+    const profileData = {
+      id: data.user.id,
+      username: userData.username,
+      name: userData.name,
+      role: userData.role as 'Admin' | 'Agriculteur',
+      client_id: userData.client_id || null,
+      status: 'Active' as 'Active' | 'Suspended'
+    }
+
+    const { error: profileError } = await (supabase as any)
       .from('users')
-      .insert({
-        id: data.user.id,
-        username: userData.username,
-        name: userData.name,
-        role: userData.role,
-        client_id: userData.client_id || null,
-        status: 'Active' as const
-      })
+      .insert(profileData)
       
     if (profileError) throw profileError
   }
