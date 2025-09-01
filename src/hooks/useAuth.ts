@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase, getCurrentUser } from '../lib/supabase'
-import type { Database } from '../types/database'
-
-type User = Database['public']['Tables']['users']['Row']
+import type { User } from '../types'
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)

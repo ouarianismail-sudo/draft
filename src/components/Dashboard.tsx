@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import type { Database } from '../types/database'
-
-type Client = Database['public']['Tables']['clients']['Row']
-type StockMovement = Database['public']['Tables']['stock_movements']['Row']
-type User = Database['public']['Tables']['users']['Row']
+import type { Client, StockMovement, User } from '../types'
 
 interface DashboardProps {
   currentUser: User

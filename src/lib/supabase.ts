@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import type { Database } from '../types/database'
+import type { Database } from '../types'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -28,14 +28,14 @@ export const signUp = async (email: string, password: string, userData: {
     // Create user profile
     const { error: profileError } = await supabase
       .from('users')
-      .insert({
+      .insert([{
         id: data.user.id,
         username: userData.username,
         name: userData.name,
         role: userData.role,
         client_id: userData.client_id || null,
         status: 'Active'
-      })
+      }])
 
     if (profileError) throw profileError
   }
