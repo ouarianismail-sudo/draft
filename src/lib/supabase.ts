@@ -25,19 +25,17 @@ export const signUp = async (email: string, password: string, userData: {
   if (error) throw error
   
   if (data.user) {
-    // Create user profile with explicit typing
-    const profileData: Database['public']['Tables']['users']['Insert'] = {
-      id: data.user.id,
-      username: userData.username,
-      name: userData.name,
-      role: userData.role,
-      client_id: userData.client_id || null,
-      status: 'Active' as const
-    }
-
+    // Create user profile
     const { error: profileError } = await supabase
       .from('users')
-      .insert([profileData])
+      .insert({
+        id: data.user.id,
+        username: userData.username,
+        name: userData.name,
+        role: userData.role,
+        client_id: userData.client_id || null,
+        status: 'Active' as const
+      })
       
     if (profileError) throw profileError
   }
@@ -61,15 +59,17 @@ export const signOut = async () => {
 }
 
 export const getCurrentUser = async () => {
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
   
+  if (userError) throw userError
   if (!user) return null
   
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('users')
     .select('*')
     .eq('id', user.id)
     .single()
     
+  if (profileError) throw profileError
   return profile
 }
