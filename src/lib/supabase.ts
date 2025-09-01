@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import type { Database } from '../types'
+import type { Database } from '../types/database'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -21,25 +21,27 @@ export const signUp = async (email: string, password: string, userData: {
     email,
     password,
   })
-
+  
   if (error) throw error
-
+  
   if (data.user) {
-    // Create user profile
+    // Create user profile with explicit typing
+    const profileData: Database['public']['Tables']['users']['Insert'] = {
+      id: data.user.id,
+      username: userData.username,
+      name: userData.name,
+      role: userData.role,
+      client_id: userData.client_id || null,
+      status: 'Active' as const
+    }
+
     const { error: profileError } = await supabase
       .from('users')
-      .insert([{
-        id: data.user.id,
-        username: userData.username,
-        name: userData.name,
-        role: userData.role,
-        client_id: userData.client_id || null,
-        status: 'Active'
-      }])
-
+      .insert([profileData])
+      
     if (profileError) throw profileError
   }
-
+  
   return data
 }
 
@@ -48,7 +50,7 @@ export const signIn = async (email: string, password: string) => {
     email,
     password,
   })
-
+  
   if (error) throw error
   return data
 }
@@ -62,12 +64,12 @@ export const getCurrentUser = async () => {
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) return null
-
+  
   const { data: profile } = await supabase
     .from('users')
     .select('*')
     .eq('id', user.id)
     .single()
-
+    
   return profile
 }
